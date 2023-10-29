@@ -1,10 +1,11 @@
 import os
-
 import youtube_dl
 import PySimpleGUI as sg
 from utils.StatusLogger import StatusLogger
 from pathlib import Path
 from moviepy.editor import *
+
+
 class SimpleYTGui:
 
     def __init__(self):
@@ -22,6 +23,7 @@ class SimpleYTGui:
                 self.defaultSaveLocation = str(self.defaultSaveLocation) + '/' + 'Pulpit'
             elif "Biurko" in listdir:
                 self.defaultSaveLocation = str(self.defaultSaveLocation) + '/' + 'Biurko'
+
     def initializeWindow(self):
         self.layout = [
             [
@@ -40,17 +42,17 @@ class SimpleYTGui:
                         sg.Column([
                             [
                                 sg.Text('Lokalizacja zapisu:'),
-                             ],
+                            ],
                             [
                                 sg.Text(self.defaultSaveLocation, key='save_location'),
                             ],
                             [
                                 sg.FolderBrowse('Wybierz inną',
-                                             initial_folder=str(self.defaultSaveLocation),
-                                             tooltip="Wybierz inną ścieżkę w której docelowo ma zostać zapisany plik",
-                                             key="browse",
-                                             enable_events=True,
-                                             )],
+                                                initial_folder=str(self.defaultSaveLocation),
+                                                tooltip="Wybierz inną ścieżkę w której docelowo ma zostać zapisany plik",
+                                                key="browse",
+                                                enable_events=True,
+                                                )],
                             [sg.HSeparator()],
                             [sg.Text("Status pobierania:")],
                             [sg.Text("Program oczekuje na wprowadzenie linku", key='status_text')],
@@ -71,25 +73,24 @@ class SimpleYTGui:
         sg.theme('Gray Gray Gray')
         self.window = sg.Window('Simple YT Downloader',
                                 self.layout,
-                                size=(400,300))
+                                size=(400, 300))
 
     def progress_hook(self, d):
         print(d)
         status = d['status']
         if status == 'finished':
-            #sprawdzenie czy plik istnieje jezeli istnieje przeniesiono
+            # sprawdzenie czy plik istnieje jezeli istnieje przeniesiono
             self.set_status_text_value('Pomyślnie pobrano.')
             self.set_status_value(100)
             self.downloaded_filename = d['filename']
             if self.window['music'].get():
                 if ".mp4" in self.downloaded_filename:
-
                     video = VideoFileClip(self.downloaded_filename)
                     old_file = self.downloaded_filename
                     convert_mp3 = self.downloaded_filename.replace('.mp4', '.mp3')
                     video.audio.write_audiofile(convert_mp3)
                     self.downloaded_filename = convert_mp3
-                    #usuniecie oryginalnego pliku
+                    # usuniecie oryginalnego pliku
                     os.remove(old_file)
             curr_dir = os.getcwd()
             curr_directory_data = os.listdir(curr_dir)
@@ -129,7 +130,7 @@ class SimpleYTGui:
         ydl_opts['nocheckcertificate'] = True
         ydl_opts['progress_hooks'] = [self.progress_hook]
 
-        #print("pobieram")
+        # print("pobieram")
         with youtube_dl.YoutubeDL(ydl_opts) as ydl:
             ydl.download([self.window['link'].get()])
 
@@ -155,6 +156,7 @@ class SimpleYTGui:
 
     def set_status_value(self, value):
         self.window['status'].update(value)
+
     def events(self):
         while True:
             event, values = self.window.read()
