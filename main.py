@@ -1,5 +1,6 @@
 import os
-import youtube_dl
+#import youtube_dl
+import yt_dlp
 import PySimpleGUI as sg
 from utils.StatusLogger import StatusLogger
 from pathlib import Path
@@ -80,7 +81,7 @@ class SimpleYTGui:
         status = d['status']
         if status == 'finished':
             # sprawdzenie czy plik istnieje jezeli istnieje przeniesiono
-            self.set_status_text_value('Pomyślnie pobrano.')
+            self.set_status_text_value('Pomyślnie pobrano, trwa konwersja')
             self.set_status_value(100)
             self.downloaded_filename = d['filename']
             if self.window['music'].get():
@@ -103,7 +104,9 @@ class SimpleYTGui:
                 self.set_status_text_value("Problem z przeniesieniem pliku")
             self.enable_download_button()
             return
-        procent = d['_percent_str'].replace('%', '')
+        procent = d['_percent_str'].replace('%', '').replace('\x1b[0;', '').replace('94m', '').replace('\x1b[0m', '').replace('\x1b[0', '')
+        print("heheheprocent")
+        print(procent)
         procent_int = int(float(procent.replace(' ', '')))
 
         print('procent')
@@ -131,7 +134,7 @@ class SimpleYTGui:
         ydl_opts['progress_hooks'] = [self.progress_hook]
 
         # print("pobieram")
-        with youtube_dl.YoutubeDL(ydl_opts) as ydl:
+        with yt_dlp.YoutubeDL(ydl_opts) as ydl:
             ydl.download([self.window['link'].get()])
 
     def check_link_exist(self):
