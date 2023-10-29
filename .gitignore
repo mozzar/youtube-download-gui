@@ -1,3 +1,6 @@
 status.txt
 .idea
 venv
+yt-downloader.spec
+build
+dist
